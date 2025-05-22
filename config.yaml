@@ -1,0 +1,15 @@
+#environment: "maze"  # Options: "maze", "CartPole-v1"
+#environment: "CartPole-v1"
+environment: MountainCar-v0
+#environment: Acrobot-v1
+total_episodes: 500
+ppo_steps: 8
+hidden_dim: 64
+dropout: 0.2
+gamma: 0.99
+lambda: 0.95
+lr: 0.0003
+epsilon: 0.2
+entropy_coefficient: 0.01
+print_interval: 10
+reward_threshold: 475

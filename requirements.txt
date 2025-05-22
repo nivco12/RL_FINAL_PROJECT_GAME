@@ -1,2 +1,8 @@
-numpy
+#numpy
+numpy==1.24.4
 matplotlib
+torch
+gymnasium
+gym
+moviepy
+pandas
