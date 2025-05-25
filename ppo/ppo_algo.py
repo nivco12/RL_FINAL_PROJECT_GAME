@@ -6,7 +6,7 @@ import torch.distributions as distributions
 from torch.utils.data import DataLoader, TensorDataset
 import gym
 import time
-
+from envs.maze_env import animate_maze, MazeEnv
 # code taken from :
 # https://www.datacamp.com/tutorial/proximal-policy-optimization
 
@@ -142,6 +142,7 @@ def evaluate(env, agent):
         state = next_state
     return total_reward
 
+
 def watch_trained_agent(env_name, agent, n_episodes=5):
     env = gym.make(env_name, render_mode="human")
     agent.eval()
@@ -166,7 +167,37 @@ def watch_trained_agent(env_name, agent, n_episodes=5):
         print(f"🏁 Episode Reward: {total_reward:.2f}")
     env.close()
 
+
+
+    
+def watch_trained_maze_agent(env, agent, n_episodes=1):
+    agent.eval()
+
+    for ep in range(n_episodes):
+        state, _ = env.reset()
+        frames = [env.get_frame()]
+        done = False
+        total_reward = 0
+
+        while not done:
+            state_tensor = torch.FloatTensor(state).unsqueeze(0)
+            with torch.no_grad():
+                action_pred, _ = agent(state_tensor)
+                action_prob = torch.softmax(action_pred, dim=-1)
+            action = torch.argmax(action_prob, dim=-1).item()
+
+            state, reward, terminated, truncated, _ = env.step(action)
+            done = terminated or truncated
+            frames.append(env.get_frame())
+            total_reward += reward
+
+        print(f"🏁 Episode {ep+1} Reward: {total_reward:.2f}")
+        animate_maze(frames, ep+1)
+
+
+
 def run_ppo(config, env_train, env_test):
+    env = config["environment"]
     input_dim = env_train.observation_space.shape[0]
     action_dim = env_train.action_space.n
     agent = create_agent(input_dim, action_dim, config["hidden_dim"], config["dropout"])
@@ -195,5 +226,10 @@ def run_ppo(config, env_train, env_test):
             print(f"✅ Solved in {episode} episodes!")
             break
 
-    watch_trained_agent(config["environment"], agent, n_episodes=3)
+    if (env == "maze"):
+        test_env_for_anim = MazeEnv()
+        watch_trained_maze_agent(test_env_for_anim, agent, n_episodes=1)        
+
+    else:
+        watch_trained_agent(config["environment"], agent, n_episodes=3)
     return train_rewards, test_rewards, policy_losses, value_losses

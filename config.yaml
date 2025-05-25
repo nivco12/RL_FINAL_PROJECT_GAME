@@ -1,6 +1,6 @@
-#environment: "maze"  # Options: "maze", "CartPole-v1"
+environment: "maze"  # Options: "maze", "CartPole-v1"
 #environment: "CartPole-v1"
-environment: MountainCar-v0
+#environment: MountainCar-v0
 #environment: Acrobot-v1
 total_episodes: 500
 ppo_steps: 8
