@@ -6,3 +6,4 @@ gymnasium
 gym
 moviepy
 pandas
+pytorch

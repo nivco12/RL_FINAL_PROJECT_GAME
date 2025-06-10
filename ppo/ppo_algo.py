@@ -7,6 +7,8 @@ from torch.utils.data import DataLoader, TensorDataset
 import gym
 import time
 from envs.maze_env import animate_maze, MazeEnv
+import matplotlib.pyplot as plt
+
 # code taken from :
 # https://www.datacamp.com/tutorial/proximal-policy-optimization
 
@@ -142,6 +144,34 @@ def evaluate(env, agent):
         state = next_state
     return total_reward
 
+def plot_train_rewards(train_rewards):
+    plt.figure(figsize=(12, 8))
+    plt.plot(train_rewards, label='Training Reward')
+    plt.xlabel('Episode', fontsize=20)
+    plt.ylabel('Training Reward', fontsize=20)
+    plt.legend(loc='lower right')
+    plt.grid()
+    plt.show()
+
+
+def plot_test_rewards(test_rewards):
+    plt.figure(figsize=(12, 8))
+    plt.plot(test_rewards, label='Testing Reward')
+    plt.xlabel('Episode', fontsize=20)
+    plt.ylabel('Testing Reward', fontsize=20)
+    plt.legend(loc='lower right')
+    plt.grid()
+    plt.show()
+
+def plot_losses(policy_losses, value_losses):
+    plt.figure(figsize=(12, 8))
+    plt.plot(value_losses, label='Value Losses')
+    plt.plot(policy_losses, label='Policy Losses')
+    plt.xlabel('Episode', fontsize=20)
+    plt.ylabel('Loss', fontsize=20)
+    plt.legend(loc='lower right')
+    plt.grid()
+    plt.show()
 
 def watch_trained_agent(env_name, agent, n_episodes=5):
     env = gym.make(env_name, render_mode="human")
@@ -225,6 +255,11 @@ def run_ppo(config, env_train, env_test):
         if np.mean(test_rewards[-10:]) >= config["reward_threshold"]:
             print(f"✅ Solved in {episode} episodes!")
             break
+
+
+    plot_train_rewards(train_rewards)
+    plot_test_rewards(test_rewards)
+    plot_losses(policy_losses, value_losses)
 
     if (env == "maze"):
         test_env_for_anim = MazeEnv()
