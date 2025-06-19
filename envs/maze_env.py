@@ -6,6 +6,7 @@ import matplotlib.animation as animation
 from matplotlib.colors import ListedColormap
 
 
+# Class for the custom maze grid game
 class MazeEnv(gym.Env):
     def __init__(self):
         super().__init__()

@@ -1,15 +1,31 @@
-#environment: "maze"
+environment: "maze"
 #environment: "CartPole-v1"
 #environment: MountainCar-v0
-environment: Acrobot-v1
+# environment: Acrobot-v1
 total_episodes: 500
 ppo_steps: 8
 hidden_dim: 64
 dropout: 0.2
+
 gamma: 0.99
 lambda: 0.95
 lr: 0.0003
 epsilon: 0.2
 entropy_coefficient: 0.01
+
+# Hyperparameters change
+# gamma: 0.9
+# lambda: 0.8
+# lr: 0.0003
+# epsilon: 0.1
+# entropy_coefficient: 0.001
+
 print_interval: 10
-reward_threshold: 475 # Need to adjust it for each game i think
+reward_threshold_maze: 0.92
+reward_threshold_CartPole-v1: 490 # Need to adjust it for each game i think
+reward_threshold_Acrobot-v1: -80
+
+# Functional parameters
+save_model: True 
+save_rewards_nrz: False
+early_stopping: False
