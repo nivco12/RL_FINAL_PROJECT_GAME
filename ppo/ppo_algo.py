@@ -8,6 +8,8 @@ import gym
 import time
 from envs.maze_env import animate_maze, MazeEnv
 import matplotlib.pyplot as plt
+import os
+from datetime import datetime
 
 # code taken from :
 # https://www.datacamp.com/tutorial/proximal-policy-optimization
@@ -226,6 +228,21 @@ def watch_trained_maze_agent(env, agent, n_episodes=1):
 
 
 
+# def save_model(agent, env_name, directory="models"):
+#     os.makedirs(directory, exist_ok=True)
+#     date_str = datetime.now().strftime("%Y-%m-%d_%H-%M")
+#     path = os.path.join(directory, f"{env_name}_{date_str}.pth")
+#     torch.save(agent.state_dict(), path)
+#     print(f"💾 Model saved to {path}")
+#     return path
+
+# def load_model(agent, path):
+#     agent.load_state_dict(torch.load(path))
+#     agent.eval()
+#     print(f"✅ Loaded model from {path}")
+
+
+
 def run_ppo(config, env_train, env_test):
     env = config["environment"]
     input_dim = env_train.observation_space.shape[0]
@@ -252,19 +269,53 @@ def run_ppo(config, env_train, env_test):
         if episode % config["print_interval"] == 0:
             print(f"Episode: {episode:3} | Train: {np.mean(train_rewards[-10:]):.2f} | Test: {np.mean(test_rewards[-10:]):.2f}")
 
-        if np.mean(test_rewards[-10:]) >= config["reward_threshold"]:
-            print(f"✅ Solved in {episode} episodes!")
-            break
+        if env == "maze":
+            if config["early_stopping"]:
+                if np.mean(test_rewards[-10:]) >= config["reward_threshold_maze"]:
+                    print(f"✅ Solved in {episode} episodes!")
+                    break
+
+        if env == "CartPole-v1":
+            if config["early_stopping"]:
+              if np.mean(test_rewards[-10:]) >= config["reward_threshold_CartPole-v1"]:
+                print(f"✅ Solved in {episode} episodes!")
+                break
+        
+        
+        if env == "Acrobot-v1":
+            if config["early_stopping"]:
+              if np.mean(test_rewards[-10:]) >= config["reward_threshold_Acrobot-v1"]:
+                print(f"✅ Solved in {episode} episodes!")
+                break
+
+
+        # if np.mean(test_rewards[-10:]) >= config["reward_threshold"]:
+        #     print(f"✅ Solved in {episode} episodes!")
+        #     break
 
 
     plot_train_rewards(train_rewards)
     plot_test_rewards(test_rewards)
     plot_losses(policy_losses, value_losses)
 
+
+     # === Save Rewards and Plot ===
+    if config["save_rewards_nrz"] == True:
+        env_name = config["environment"]
+        rewards_filename = f"{env_name}_ppo_rewards.npz"
+        np.savez(rewards_filename, ppo=train_rewards)
+        print(f"📁 Saved PPO rewards to: {rewards_filename}")
+
+    # Watch trained agent play
     if (env == "maze"):
         test_env_for_anim = MazeEnv()
         watch_trained_maze_agent(test_env_for_anim, agent, n_episodes=1)        
 
     else:
         watch_trained_agent(config["environment"], agent, n_episodes=3)
+    
+    # if (config["save_model"] == True):
+    #       # Save the model with game name and timestamp
+    #       save_model(agent, config["environment"])
+
     return train_rewards, test_rewards, policy_losses, value_losses

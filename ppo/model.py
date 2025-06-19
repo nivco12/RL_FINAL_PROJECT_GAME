@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 class ActorCritic(nn.Module):
-    def __init__(self, state_dim, action_dim, hidden_dim=64, dropout=0.2):
+    def __init__(self, state_dim, action_dim, hidden_dim=64, dropout=0.2): # hidden_dim=64 is default. it will be overwritten if in config there is a different number
         super().__init__()
         self.shared = nn.Sequential(
             nn.Linear(state_dim, hidden_dim),
